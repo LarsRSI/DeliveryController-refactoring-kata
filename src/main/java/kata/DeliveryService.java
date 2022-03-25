@@ -9,10 +9,11 @@ import java.util.List;
 public class DeliveryService {
 
   private final SendgridEmailGateway emailGateway;
-  private final MapService mapService = new MapService();
+  private final MapService mapService;
 
-  public DeliveryService() {
-    emailGateway = new SendgridEmailGateway();
+  public DeliveryService(SendgridEmailGateway emailGateway, MapService mapService) {
+    this.emailGateway = emailGateway;
+    this.mapService = mapService;
   }
 
   public List<Delivery> on(DeliveryEvent deliveryEvent, List<Delivery> deliverySchedule) {
