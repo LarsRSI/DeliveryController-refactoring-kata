@@ -13,8 +13,11 @@ public class TestFactory {
     }
 
     public static Delivery createDeliveryWithEmail(String contactEmail) {
-        return new Delivery(789L, contactEmail, 58.377047f, 26.727889f,
-                localDateTime(18, 28), false, false);
+        return new Delivery(789L, contactEmail, 58.377047f, 26.727889f, localDateTime(18, 28), false, false);
+    }
+
+    public static Delivery createDeliveryWithEmailForLocation(String contactEmail, float latitude, float longitude) {
+        return new Delivery(999L, contactEmail, latitude, longitude, localDateTime(18, 28), false, false);
     }
 
     public static DeliveryEvent deliveryEventAt(int hour, int minute) {

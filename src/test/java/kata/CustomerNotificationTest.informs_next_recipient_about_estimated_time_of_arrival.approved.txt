@@ -1,0 +1,2 @@
+Arguments[to=test@example.com, subject=Your feedback is important to us, message=Regarding your delivery today at 2022-04-07 17:45. How likely would you be to recommend this delivery service to a friend? Click <a href='url'>here</a>]
+Arguments[to=next@example.com, subject=Your delivery will arrive soon, message=Your delivery to [58.376125,24.496687] is next, estimated time of arrival is in 156 minutes. Be ready!]

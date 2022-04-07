@@ -2,6 +2,7 @@ package kata;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class RecordingEmailGateway extends SendgridEmailGateway {
 
@@ -13,7 +14,7 @@ public class RecordingEmailGateway extends SendgridEmailGateway {
     }
 
     public String invocations() {
-        return invocations.toString();
+        return invocations.stream().map(Record::toString).collect(Collectors.joining("\n"));
     }
 
     record Arguments(String to, String subject, String message) {

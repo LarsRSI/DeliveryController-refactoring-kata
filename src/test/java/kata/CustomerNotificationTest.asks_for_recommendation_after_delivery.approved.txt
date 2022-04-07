@@ -1,1 +1,1 @@
-[Arguments[to=test@example.com, subject=Your feedback is important to us, message=Regarding your delivery today at 2022-04-07 17:45. How likely would you be to recommend this delivery service to a friend? Click <a href='url'>here</a>]]
+Arguments[to=test@example.com, subject=Your feedback is important to us, message=Regarding your delivery today at 2022-04-07 17:45. How likely would you be to recommend this delivery service to a friend? Click <a href='url'>here</a>]

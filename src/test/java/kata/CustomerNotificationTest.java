@@ -10,6 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import java.util.List;
 
 import static kata.TestFactory.createDeliveryWithEmail;
+import static kata.TestFactory.createDeliveryWithEmailForLocation;
 import static kata.TestFactory.deliveryEventForDelivery;
 
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
@@ -25,6 +26,17 @@ public class CustomerNotificationTest {
         var deliveryEvent = deliveryEventForDelivery(delivery, 17, 45);
 
         deliveryService.on(deliveryEvent, List.of(delivery));
+
+        Approvals.verify(emailGateway.invocations());
+    }
+
+    @Test
+    void informs_next_recipient_about_estimated_time_of_arrival() {
+        var delivery = createDeliveryWithEmail("test@example.com");
+        var deliveryEvent = deliveryEventForDelivery(delivery, 17, 45);
+        var nextDelivery = createDeliveryWithEmailForLocation("next@example.com", 58.376125f,24.496687f);
+
+        deliveryService.on(deliveryEvent, List.of(delivery, nextDelivery));
 
         Approvals.verify(emailGateway.invocations());
     }
