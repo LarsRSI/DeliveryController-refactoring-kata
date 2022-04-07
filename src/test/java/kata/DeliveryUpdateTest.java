@@ -6,16 +6,16 @@ import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
+import static kata.TestFactory.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 @ExtendWith(CommitOnGreenExtension.class)
-class DeliveryServiceTest {
+class DeliveryUpdateTest {
 
-    private DeliveryService deliveryService = new DeliveryService(new NoOpEmailGateway());
+    private final DeliveryService deliveryService = new DeliveryService(new NoOpEmailGateway());
 
     @Test
     void marks_delivery_as_arrived() {
@@ -27,15 +27,6 @@ class DeliveryServiceTest {
         assertThat(delivery.isArrived()).isTrue();
     }
 
-    private DeliveryEvent createDeliveryEventWithId(long id) {
-        return new DeliveryEvent(id, localDateTime(18, 28), 58.377047f, 26.727889f);
-    }
-
-    private Delivery createDeliveryWithId(long id) {
-        return new Delivery(id, "any@example.com", 58.377047f, 26.727889f,
-                localDateTime(18, 28), false, false);
-    }
-
     @Test
     void marks_delivery_on_time_when_took_less_than_10_minutes() {
         var delivery = deliveryOrderedAt(10, 40);
@@ -44,19 +35,6 @@ class DeliveryServiceTest {
         deliveryService.on(deliveryEvent, List.of(delivery));
 
         assertThat(delivery.isOnTime()).isTrue();
-    }
-
-    private DeliveryEvent deliveryEventAt(int hour, int minute) {
-        return new DeliveryEvent(123L, localDateTime(hour, minute), 58.377047f, 26.727889f);
-    }
-
-    private Delivery deliveryOrderedAt(int hour, int minute) {
-        return new Delivery(123L, "any@example.com", 58.377047f, 26.727889f,
-                localDateTime(hour, minute), false, false);
-    }
-
-    private LocalDateTime localDateTime(int hour, int minute) {
-        return LocalDateTime.of(2022, 4, 7, hour, minute);
     }
 
     @Test
