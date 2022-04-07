@@ -30,6 +30,17 @@ class DeliveryUpdateTest {
     }
 
     @Test
+    void returns_list_with_updated_delivery() {
+        var delivery = createDeliveryWithId(123L);
+        var deliveryEvent = createDeliveryEventWithId(123L);
+        List<Delivery> deliverySchedule = List.of(delivery);
+
+        List<Delivery> deliveries = deliveryService.on(deliveryEvent, deliverySchedule);
+
+        assertThat(deliveries).isEqualTo(deliverySchedule);
+    }
+
+    @Test
     void marks_delivery_on_time_when_took_less_than_10_minutes() {
         var delivery = createDeliveryOrderedAt(2L, 10, 40);
         var deliveryEvent = deliveryEventAt(10, 49);
