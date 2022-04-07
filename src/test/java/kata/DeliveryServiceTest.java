@@ -17,12 +17,7 @@ class DeliveryServiceTest {
 
     @Test
     void marks_delivery_as_arrived() {
-      DeliveryService deliveryService = new DeliveryService(new SendgridEmailGateway(){
-          @Override
-          public void send(String to, String subject, String message) {
-              
-          }
-      });
+      DeliveryService deliveryService = new DeliveryService(new NoOpEmailGateway());
       Delivery delivery = new Delivery(123L, "any@example.com", 58.377047f, 26.727889f,
               LocalDateTime.of(2022, 4, 7, 18, 28), false, false);
 
@@ -30,5 +25,12 @@ class DeliveryServiceTest {
               List.of(delivery));
 
       assertThat(delivery.isArrived()).isTrue();
+    }
+
+    private static class NoOpEmailGateway extends SendgridEmailGateway {
+        @Override
+        public void send(String to, String subject, String message) {
+
+        }
     }
 }
