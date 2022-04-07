@@ -1,0 +1,1 @@
+Arguments[elapsedTime=PT19M, latitude=58.37705, longitude=26.727888, otherLatitude=58.37705, otherLongitude=26.727888]

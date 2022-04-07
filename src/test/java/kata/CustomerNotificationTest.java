@@ -14,7 +14,6 @@ import static kata.TestFactory.createDeliveryWithEmailForLocation;
 import static kata.TestFactory.deliveryEventForDelivery;
 
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-@ExtendWith(CommitOnGreenExtension.class)
 public class CustomerNotificationTest {
 
     private RecordingEmailGateway emailGateway = new RecordingEmailGateway();

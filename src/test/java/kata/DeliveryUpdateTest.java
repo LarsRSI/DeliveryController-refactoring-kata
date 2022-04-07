@@ -9,7 +9,7 @@ import java.util.List;
 import static kata.TestFactory.createDeliveryEventWithId;
 import static kata.TestFactory.createDeliveryWithId;
 import static kata.TestFactory.deliveryEventAt;
-import static kata.TestFactory.deliveryOrderedAt;
+import static kata.TestFactory.createDeliveryOrderedAt;
 import static kata.TestFactory.localDateTime;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -30,7 +30,7 @@ class DeliveryUpdateTest {
 
     @Test
     void marks_delivery_on_time_when_took_less_than_10_minutes() {
-        var delivery = deliveryOrderedAt(10, 40);
+        var delivery = createDeliveryOrderedAt(2L, 10, 40);
         var deliveryEvent = deliveryEventAt(10, 49);
 
         deliveryService.on(deliveryEvent, List.of(delivery));
@@ -40,7 +40,7 @@ class DeliveryUpdateTest {
 
     @Test
     void marks_delivery_not_on_time_when_took_more_or_equal_than_10_minutes() {
-        var delivery = deliveryOrderedAt(19, 30);
+        var delivery = createDeliveryOrderedAt(2L, 19, 30);
         var deliveryEvent = deliveryEventAt(19, 40);
 
         deliveryService.on(deliveryEvent, List.of(delivery));
@@ -50,7 +50,7 @@ class DeliveryUpdateTest {
 
     @Test
     void sets_delivery_time_on_delivery() {
-        var delivery = deliveryOrderedAt(19, 30);
+        var delivery = createDeliveryOrderedAt(2L, 19, 30);
         var deliveryEvent = deliveryEventAt(19, 40);
 
         deliveryService.on(deliveryEvent, List.of(delivery));
@@ -58,10 +58,4 @@ class DeliveryUpdateTest {
         assertThat(delivery.getTimeOfDelivery()).isEqualTo(localDateTime(19, 40));
     }
 
-    private static class NoOpEmailGateway extends SendgridEmailGateway {
-        @Override
-        public void send(String to, String subject, String message) {
-
-        }
-    }
 }

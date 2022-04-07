@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 
 public class RecordingEmailGateway extends SendgridEmailGateway {
 
-    private List<Arguments> invocations = new ArrayList<>();
+    private final List<Arguments> invocations = new ArrayList<>();
 
     @Override
     public void send(String to, String subject, String message) {
