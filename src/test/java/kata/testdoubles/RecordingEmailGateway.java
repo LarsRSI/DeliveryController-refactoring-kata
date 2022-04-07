@@ -1,4 +1,6 @@
-package kata;
+package kata.testdoubles;
+
+import kata.SendgridEmailGateway;
 
 import java.util.ArrayList;
 import java.util.List;

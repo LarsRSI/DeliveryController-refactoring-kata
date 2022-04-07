@@ -1,4 +1,6 @@
-package kata;
+package kata.testdoubles;
+
+import kata.MapService;
 
 import java.time.Duration;
 import java.util.ArrayList;

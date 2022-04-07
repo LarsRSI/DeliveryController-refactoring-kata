@@ -1,6 +1,8 @@
 package kata;
 
 import com.github.larseckart.tcr.CommitOnGreenExtension;
+import kata.testdoubles.NoOpEmailGateway;
+import kata.testdoubles.RecordingMapService;
 import org.approvaltests.Approvals;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
