@@ -28,12 +28,12 @@ class DeliveryServiceTest {
     }
 
     private DeliveryEvent createDeliveryEventWithId(long id) {
-        return new DeliveryEvent(id, LocalDateTime.of(2022, 4, 7, 18, 28), 58.377047f, 26.727889f);
+        return new DeliveryEvent(id, localDateTime(18, 28), 58.377047f, 26.727889f);
     }
 
     private Delivery createDeliveryWithId(long id) {
         return new Delivery(id, "any@example.com", 58.377047f, 26.727889f,
-                LocalDateTime.of(2022, 4, 7, 18, 28), false, false);
+                localDateTime(18, 28), false, false);
     }
 
     @Test
@@ -47,12 +47,16 @@ class DeliveryServiceTest {
     }
 
     private DeliveryEvent deliveryEventAt(int hour, int minute) {
-        return new DeliveryEvent(123L, LocalDateTime.of(2022, 4, 7, hour, minute), 58.377047f, 26.727889f);
+        return new DeliveryEvent(123L, localDateTime(hour, minute), 58.377047f, 26.727889f);
     }
 
     private Delivery deliveryOrderedAt(int hour, int minute) {
         return new Delivery(123L, "any@example.com", 58.377047f, 26.727889f,
-                LocalDateTime.of(2022, 4, 7, hour, minute), false, false);
+                localDateTime(hour, minute), false, false);
+    }
+
+    private LocalDateTime localDateTime(int hour, int minute) {
+        return LocalDateTime.of(2022, 4, 7, hour, minute);
     }
 
     @Test
@@ -63,6 +67,16 @@ class DeliveryServiceTest {
         deliveryService.on(deliveryEvent, List.of(delivery));
 
         assertThat(delivery.isOnTime()).isFalse();
+    }
+
+    @Test
+    void sets_delivery_time_on_delivery() {
+        var delivery = deliveryOrderedAt(19, 30);
+        var deliveryEvent = deliveryEventAt(19, 40);
+
+        deliveryService.on(deliveryEvent, List.of(delivery));
+
+        assertThat(delivery.getTimeOfDelivery()).isEqualTo(localDateTime(19, 40));
     }
 
     private static class NoOpEmailGateway extends SendgridEmailGateway {
