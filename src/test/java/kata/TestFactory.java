@@ -12,8 +12,17 @@ public class TestFactory {
                 localDateTime(18, 28), false, false);
     }
 
+    public static Delivery createDeliveryWithEmail(String contactEmail) {
+        return new Delivery(789L, contactEmail, 58.377047f, 26.727889f,
+                localDateTime(18, 28), false, false);
+    }
+
     public static DeliveryEvent deliveryEventAt(int hour, int minute) {
         return new DeliveryEvent(123L, localDateTime(hour, minute), 58.377047f, 26.727889f);
+    }
+
+    public static DeliveryEvent deliveryEventForDelivery(Delivery delivery, int hour, int minute) {
+        return new DeliveryEvent(delivery.getId(), localDateTime(hour, minute), 58.377047f, 26.727889f);
     }
 
     public static Delivery deliveryOrderedAt(int hour, int minute) {

@@ -1,18 +1,19 @@
 package kata;
 
-import com.github.larseckart.tcr.CommitOnGreenExtension;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.List;
 
-import static kata.TestFactory.*;
+import static kata.TestFactory.createDeliveryEventWithId;
+import static kata.TestFactory.createDeliveryWithId;
+import static kata.TestFactory.deliveryEventAt;
+import static kata.TestFactory.deliveryOrderedAt;
+import static kata.TestFactory.localDateTime;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-@ExtendWith(CommitOnGreenExtension.class)
 class DeliveryUpdateTest {
 
     private final DeliveryService deliveryService = new DeliveryService(new NoOpEmailGateway());
