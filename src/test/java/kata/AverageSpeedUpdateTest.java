@@ -25,12 +25,12 @@ public class AverageSpeedUpdateTest {
 
     @Test
     void update_average_speed_when_multiple_deliveries_and_current_delivery_is_late() {
-        var delivery = createCompletedDeliveryAt(17, 0);
+        var completedDelivery = createCompletedDeliveryAt(17, 0);
         var currentDelivery = createDeliveryOrderedAt(2L, 17, 2);
-        var delivery3 = createDeliveryWithId(3L);
+        var nextDelivery = createDeliveryWithId(3L);
         var deliveryEvent = deliveryEventForDelivery(currentDelivery, 17, 19);
 
-        deliveryService.on(deliveryEvent, List.of(delivery, currentDelivery, delivery3));
+        deliveryService.on(deliveryEvent, List.of(completedDelivery, currentDelivery, nextDelivery));
 
         Approvals.verify(mapService.invocations());
     }
