@@ -11,8 +11,8 @@ public class DeliveryService {
   private final SendgridEmailGateway emailGateway;
   private final MapService mapService = new MapService();
 
-  public DeliveryService() {
-    emailGateway = new SendgridEmailGateway();
+  public DeliveryService(SendgridEmailGateway emailGateway) {
+    this.emailGateway = emailGateway;
   }
 
   public List<Delivery> on(DeliveryEvent deliveryEvent, List<Delivery> deliverySchedule) {
