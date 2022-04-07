@@ -39,6 +39,17 @@ class DeliveryServiceTest {
       assertThat(delivery.isOnTime()).isTrue();
     }
 
+    @Test
+    void marks_delivery_not_on_time_when_took_more_or_equal_than_10_minutes() {
+      Delivery delivery = new Delivery(123L, "any@example.com", 58.377047f, 26.727889f,
+              LocalDateTime.of(2022, 4, 7, 18, 28), false, false);
+
+      deliveryService.on(new DeliveryEvent(123L, LocalDateTime.of(2022, 4, 7, 18, 38), 58.377047f, 26.727889f),
+              List.of(delivery));
+
+      assertThat(delivery.isOnTime()).isFalse();
+    }
+
     private static class NoOpEmailGateway extends SendgridEmailGateway {
         @Override
         public void send(String to, String subject, String message) {
