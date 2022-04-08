@@ -5,6 +5,7 @@ import jakarta.inject.Singleton;
 import java.time.Duration;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 
 @Singleton
 public class DeliveryService {
@@ -22,7 +23,7 @@ public class DeliveryService {
     }
 
     public List<Delivery> on(DeliveryEvent deliveryEvent, List<Delivery> deliverySchedule) {
-        Delivery nextDelivery = null;
+        Optional<Delivery> nextDelivery = Optional.empty();
         for (int i = 0; i < deliverySchedule.size(); i++) {
             Delivery delivery = deliverySchedule.get(i);
             if (deliveryEvent.id() == delivery.getId()) {
@@ -30,21 +31,20 @@ public class DeliveryService {
             }
         }
 
-        if (nextDelivery != null) {
+        nextDelivery.ifPresent(delivery -> {
             var nextEta = mapService.calculateETA(
                     deliveryEvent.latitude(), deliveryEvent.longitude(),
-                    nextDelivery.getLatitude(), nextDelivery.getLongitude());
+                    delivery.getLatitude(), delivery.getLongitude());
             var message =
 
                     "Your delivery to [%s,%s] is next, estimated time of arrival is in %s minutes. Be ready!".formatted(
-                            nextDelivery.getLatitude(), nextDelivery.getLongitude(), nextEta.getSeconds() / 60);
-            emailGateway.send(nextDelivery.getContactEmail(), "Your delivery will arrive soon", message
-            );
-        }
+                            delivery.getLatitude(), delivery.getLongitude(), nextEta.getSeconds() / 60);
+            emailGateway.send(delivery.getContactEmail(), "Your delivery will arrive soon", message);
+        });
         return deliverySchedule;
     }
 
-    private Delivery modifyDeliveryAndSendFeedbackEmailAndDetermineNextDeliveryAndMaybeUpdateAverageSpeed(DeliveryEvent deliveryEvent, List<Delivery> deliverySchedule, int i, Delivery delivery) {
+    private Optional<Delivery> modifyDeliveryAndSendFeedbackEmailAndDetermineNextDeliveryAndMaybeUpdateAverageSpeed(DeliveryEvent deliveryEvent, List<Delivery> deliverySchedule, int i, Delivery delivery) {
         updateDelivery(deliveryEvent, delivery);
 
         sendFeedbackEmail(delivery);
@@ -54,11 +54,11 @@ public class DeliveryService {
         return getNextDelivery(deliverySchedule, i);
     }
 
-    private Delivery getNextDelivery(List<Delivery> deliverySchedule, int i) {
+    private Optional<Delivery> getNextDelivery(List<Delivery> deliverySchedule, int i) {
         if (deliverySchedule.size() > i + 1) {
-            return deliverySchedule.get(i + 1);
+            return Optional.ofNullable(deliverySchedule.get(i + 1));
         }
-        return null;
+        return Optional.empty();
     }
 
     private void maybeUpdateAverageSpeed(List<Delivery> deliverySchedule, int i, Delivery delivery) {
