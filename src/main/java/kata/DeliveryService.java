@@ -26,7 +26,7 @@ public class DeliveryService {
         for (int i = 0; i < deliverySchedule.size(); i++) {
             Delivery delivery = deliverySchedule.get(i);
             if (deliveryEvent.id() == delivery.getId()) {
-                nextDelivery = modifyDeliveryAndSendFeedbackEmailAndDetermineNextDeliveryAndMaybeUpdateAverageSpeed(deliveryEvent, deliverySchedule, nextDelivery, i, delivery);
+                nextDelivery = modifyDeliveryAndSendFeedbackEmailAndDetermineNextDeliveryAndMaybeUpdateAverageSpeed(deliveryEvent, deliverySchedule, i, delivery);
             }
         }
 
@@ -44,11 +44,24 @@ public class DeliveryService {
         return deliverySchedule;
     }
 
-    private Delivery modifyDeliveryAndSendFeedbackEmailAndDetermineNextDeliveryAndMaybeUpdateAverageSpeed(DeliveryEvent deliveryEvent, List<Delivery> deliverySchedule, Delivery nextDelivery, int i, Delivery delivery) {
+    private Delivery modifyDeliveryAndSendFeedbackEmailAndDetermineNextDeliveryAndMaybeUpdateAverageSpeed(DeliveryEvent deliveryEvent, List<Delivery> deliverySchedule, int i, Delivery delivery) {
         updateDelivery(deliveryEvent, delivery);
 
         sendFeedbackEmail(delivery);
-        
+
+        maybeUpdateAverageSpeed(deliverySchedule, i, delivery);
+
+        return getNextDelivery(deliverySchedule, i);
+    }
+
+    private Delivery getNextDelivery(List<Delivery> deliverySchedule, int i) {
+        if (deliverySchedule.size() > i + 1) {
+            return deliverySchedule.get(i + 1);
+        }
+        return null;
+    }
+
+    private void maybeUpdateAverageSpeed(List<Delivery> deliverySchedule, int i, Delivery delivery) {
         if (!delivery.isOnTime() && deliverySchedule.size() > 1 && i > 0) {
             var previousDelivery = deliverySchedule.get(i - 1);
             Duration elapsedTime = Duration.between(previousDelivery.getTimeOfDelivery(), delivery.getTimeOfDelivery());
@@ -57,11 +70,6 @@ public class DeliveryService {
                     previousDelivery.getLatitude(), previousDelivery.getLongitude(),
                     delivery.getLatitude(), delivery.getLongitude());
         }
-
-        if (deliverySchedule.size() > i + 1) {
-            nextDelivery = deliverySchedule.get(i + 1);
-        }
-        return nextDelivery;
     }
 
     private void updateDelivery(DeliveryEvent deliveryEvent, Delivery delivery) {
