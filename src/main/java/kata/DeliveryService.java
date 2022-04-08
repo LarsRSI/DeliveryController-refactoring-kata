@@ -33,13 +33,10 @@ public class DeliveryService {
                 findPreviousDelivery(deliverySchedule).ifPresent(previousDelivery -> {
                     Duration elapsedTime = Duration.between(previousDelivery.getTimeOfDelivery(), delivery.getTimeOfDelivery());
                     mapService.updateAverageSpeed(
-                            elapsedTime,
-                            previousDelivery.getLatitude(), previousDelivery.getLongitude(),
-                            delivery.getLatitude(), delivery.getLongitude());
+                            elapsedTime, previousDelivery.getLocation(), delivery.getLocation());
                 });
             }
         });
-
 
         findNextDelivery(deliveryEvent, deliverySchedule).ifPresent(delivery -> {
             var nextEta = mapService.calculateETA(
@@ -99,8 +96,8 @@ public class DeliveryService {
 
     private void sendSoonArrivingEmail(Delivery delivery, Duration nextEta) {
         var message =
-                "Your delivery to [%s,%s] is next, estimated time of arrival is in %s minutes. Be ready!".formatted(
-                        delivery.getLatitude(), delivery.getLongitude(), nextEta.getSeconds() / 60);
+                "Your delivery to %s is next, estimated time of arrival is in %s minutes. Be ready!".formatted(
+                        delivery.getLocation(), nextEta.getSeconds() / 60);
         emailGateway.send(delivery.getContactEmail(), "Your delivery will arrive soon", message);
     }
 

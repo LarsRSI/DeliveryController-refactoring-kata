@@ -20,9 +20,9 @@ public class MapService {
   }
 
   public void updateAverageSpeed(Duration elapsedTime,
-      float latitude, float longitude, float otherLatitude, float otherLongitude) {
-    var distance = this.calculateDistance(latitude, longitude,
-        otherLatitude, otherLongitude);
+                                 Location location, Location location1) {
+    var distance = this.calculateDistance(location.latitude(), location.longitude(),
+            location1.getLatitude(), location1.getLongitude());
     var updatedSpeed = distance / (elapsedTime.getSeconds() / (double) SECONDS_PER_HOUR);
     this.averageSpeed = updatedSpeed;
   }

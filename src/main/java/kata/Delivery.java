@@ -80,6 +80,10 @@ public final class Delivery {
     this.onTime = onTime;
   }
 
+  public Location getLocation() {
+    return new Location(getLatitude(), getLongitude());
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
