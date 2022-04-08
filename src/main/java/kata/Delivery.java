@@ -40,16 +40,8 @@ public final class Delivery {
     this.contactEmail = contactEmail;
   }
 
-  public float getLatitude() {
-    return latitude;
-  }
-
   public void setLatitude(float latitude) {
     this.latitude = latitude;
-  }
-
-  public float getLongitude() {
-    return longitude;
   }
 
   public void setLongitude(float longitude) {
@@ -81,7 +73,7 @@ public final class Delivery {
   }
 
   public Location getLocation() {
-    return new Location(getLatitude(), getLongitude());
+    return new Location(latitude, longitude);
   }
 
   @Override
