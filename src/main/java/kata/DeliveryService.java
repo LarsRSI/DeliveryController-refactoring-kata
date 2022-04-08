@@ -32,16 +32,13 @@ public class DeliveryService {
             if (!delivery.isOnTime()) {
                 findPreviousDelivery(deliverySchedule).ifPresent(previousDelivery -> {
                     Duration elapsedTime = Duration.between(previousDelivery.getTimeOfDelivery(), delivery.getTimeOfDelivery());
-                    mapService.updateAverageSpeed(
-                            elapsedTime, previousDelivery.getLocation(), delivery.getLocation());
+                    mapService.updateAverageSpeed(elapsedTime, previousDelivery.getLocation(), delivery.getLocation());
                 });
             }
         });
 
         findNextDelivery(deliveryEvent, deliverySchedule).ifPresent(delivery -> {
-            var nextEta = mapService.calculateETA(
-                    deliveryEvent.latitude(), deliveryEvent.longitude(),
-                    delivery.getLatitude(), delivery.getLongitude());
+            var nextEta = mapService.calculateETA(deliveryEvent.getLocation(), delivery.getLocation());
             sendSoonArrivingEmail(delivery, nextEta);
         });
 

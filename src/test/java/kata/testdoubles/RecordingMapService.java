@@ -13,8 +13,8 @@ public class RecordingMapService extends MapService {
     private final List<Arguments> invocations = new ArrayList<>();
 
     @Override
-    public void updateAverageSpeed(Duration elapsedTime, Location location, Location location1) {
-        invocations.add(new Arguments(elapsedTime, location.latitude(), location.longitude(), location1.getLatitude(), location1.getLongitude()));
+    public void updateAverageSpeed(Duration elapsedTime, Location location, Location otherLocation) {
+        invocations.add(new Arguments(elapsedTime, location.latitude(), location.longitude(), otherLocation.getLatitude(), otherLocation.getLongitude()));
     }
 
     public String invocations() {
