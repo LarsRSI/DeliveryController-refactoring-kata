@@ -8,9 +8,9 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static kata.TestFactory.createDeliveryEventWithId;
+import static kata.TestFactory.createDeliveryOrderedAt;
 import static kata.TestFactory.createDeliveryWithId;
 import static kata.TestFactory.deliveryEventAt;
-import static kata.TestFactory.createDeliveryOrderedAt;
 import static kata.TestFactory.localDateTime;
 import static org.assertj.core.api.Assertions.assertThat;
 

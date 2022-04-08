@@ -1,13 +1,11 @@
 package kata;
 
-import com.github.larseckart.tcr.CommitOnGreenExtension;
 import kata.testdoubles.NoOpEmailGateway;
 import kata.testdoubles.RecordingMapService;
 import org.approvaltests.Approvals;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.List;
 
@@ -17,7 +15,6 @@ import static kata.TestFactory.createDeliveryWithId;
 import static kata.TestFactory.deliveryEventForDelivery;
 
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-@ExtendWith(CommitOnGreenExtension.class)
 public class AverageSpeedUpdateTest {
 
     private final RecordingMapService mapService = new RecordingMapService();
