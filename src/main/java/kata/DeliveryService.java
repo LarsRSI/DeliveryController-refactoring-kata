@@ -24,6 +24,7 @@ public class DeliveryService {
 
     public List<Delivery> on(DeliveryEvent deliveryEvent, List<Delivery> deliverySchedule) {
         Optional<Delivery> currentDelivery = findCurrentDelivery(deliveryEvent, deliverySchedule);
+
         currentDelivery.ifPresent(delivery -> {
             updateDelivery(deliveryEvent, delivery);
             sendFeedbackEmail(delivery);
@@ -40,16 +41,12 @@ public class DeliveryService {
         });
 
 
-        findNextDelivery(deliveryEvent, deliverySchedule).
-
-                ifPresent(delivery ->
-
-                {
-                    var nextEta = mapService.calculateETA(
-                            deliveryEvent.latitude(), deliveryEvent.longitude(),
-                            delivery.getLatitude(), delivery.getLongitude());
-                    sendSoonArrivingEmail(delivery, nextEta);
-                });
+        findNextDelivery(deliveryEvent, deliverySchedule).ifPresent(delivery -> {
+            var nextEta = mapService.calculateETA(
+                    deliveryEvent.latitude(), deliveryEvent.longitude(),
+                    delivery.getLatitude(), delivery.getLongitude());
+            sendSoonArrivingEmail(delivery, nextEta);
+        });
 
         return deliverySchedule;
     }
