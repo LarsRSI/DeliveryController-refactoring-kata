@@ -27,9 +27,9 @@ public class DeliveryService {
             Delivery delivery = deliverySchedule.get(i);
             if (deliveryEvent.id() == delivery.getId()) {
                 delivery.setArrived(true);
-                Duration d = Duration.between(delivery.getTimeOfDelivery(), deliveryEvent.timeOfDelivery());
+                Duration duration = Duration.between(delivery.getTimeOfDelivery(), deliveryEvent.timeOfDelivery());
 
-                if (d.toMinutes() < 10) {
+                if (duration.toMinutes() < 10) {
                     delivery.setOnTime(true);
                 }
                 delivery.setTimeOfDelivery(deliveryEvent.timeOfDelivery());
