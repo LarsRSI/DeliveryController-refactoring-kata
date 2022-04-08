@@ -23,12 +23,16 @@ public class DeliveryService {
     }
 
     public List<Delivery> on(DeliveryEvent deliveryEvent, List<Delivery> deliverySchedule) {
-
         for (int i = 0; i < deliverySchedule.size(); i++) {
             Delivery delivery = deliverySchedule.get(i);
             if (deliveryEvent.id() == delivery.getId()) {
                 updateDelivery(deliveryEvent, delivery);
                 sendFeedbackEmail(delivery);
+            }
+        }
+        for (int i = 0; i < deliverySchedule.size(); i++) {
+            Delivery delivery = deliverySchedule.get(i);
+            if (deliveryEvent.id() == delivery.getId()) {
                 maybeUpdateAverageSpeed(deliverySchedule, i, delivery);
             }
         }
