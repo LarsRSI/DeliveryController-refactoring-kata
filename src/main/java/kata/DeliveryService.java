@@ -23,17 +23,23 @@ public class DeliveryService {
     }
 
     public List<Delivery> on(DeliveryEvent deliveryEvent, List<Delivery> deliverySchedule) {
-        for (int i = 0; i < deliverySchedule.size(); i++) {
-            Delivery delivery = deliverySchedule.get(i);
-            if (deliveryEvent.id() == delivery.getId()) {
-                updateDelivery(deliveryEvent, delivery);
-                sendFeedbackEmail(delivery);
-            }
+        Delivery currentDelivery = findCurrentDelivery(deliveryEvent, deliverySchedule);
+        if (currentDelivery != null) {
+            updateDelivery(deliveryEvent, currentDelivery);
+            sendFeedbackEmail(currentDelivery);
         }
+
         for (int i = 0; i < deliverySchedule.size(); i++) {
             Delivery delivery = deliverySchedule.get(i);
             if (deliveryEvent.id() == delivery.getId()) {
-                maybeUpdateAverageSpeed(deliverySchedule, i, delivery);
+                if (!delivery.isOnTime() && deliverySchedule.size() > 1 && i > 0) {
+                    var previousDelivery = deliverySchedule.get(i - 1);
+                    Duration elapsedTime = Duration.between(previousDelivery.getTimeOfDelivery(), delivery.getTimeOfDelivery());
+                    mapService.updateAverageSpeed(
+                            elapsedTime,
+                            previousDelivery.getLatitude(), previousDelivery.getLongitude(),
+                            delivery.getLatitude(), delivery.getLongitude());
+                }
             }
         }
 
@@ -45,6 +51,15 @@ public class DeliveryService {
         });
 
         return deliverySchedule;
+    }
+
+    private Delivery findCurrentDelivery(DeliveryEvent deliveryEvent, List<Delivery> deliverySchedule) {
+        for (Delivery delivery : deliverySchedule) {
+            if (deliveryEvent.id() == delivery.getId()) {
+                return delivery;
+            }
+        }
+        return null;
     }
 
     private Optional<Delivery> findNextDelivery(DeliveryEvent deliveryEvent, List<Delivery> deliverySchedule) {
@@ -63,17 +78,6 @@ public class DeliveryService {
             return Optional.of(deliverySchedule.get(index + 1));
         }
         return Optional.empty();
-    }
-
-    private void maybeUpdateAverageSpeed(List<Delivery> deliverySchedule, int index, Delivery delivery) {
-        if (!delivery.isOnTime() && deliverySchedule.size() > 1 && index > 0) {
-            var previousDelivery = deliverySchedule.get(index - 1);
-            Duration elapsedTime = Duration.between(previousDelivery.getTimeOfDelivery(), delivery.getTimeOfDelivery());
-            mapService.updateAverageSpeed(
-                    elapsedTime,
-                    previousDelivery.getLatitude(), previousDelivery.getLongitude(),
-                    delivery.getLatitude(), delivery.getLongitude());
-        }
     }
 
     private void updateDelivery(DeliveryEvent deliveryEvent, Delivery delivery) {
