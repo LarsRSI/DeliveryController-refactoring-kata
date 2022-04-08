@@ -23,24 +23,35 @@ public class DeliveryService {
     }
 
     public List<Delivery> on(DeliveryEvent deliveryEvent, List<Delivery> deliverySchedule) {
-        Optional<Delivery> nextDelivery = Optional.empty();
+
         for (int i = 0; i < deliverySchedule.size(); i++) {
             Delivery delivery = deliverySchedule.get(i);
             if (deliveryEvent.id() == delivery.getId()) {
                 updateDelivery(deliveryEvent, delivery);
                 sendFeedbackEmail(delivery);
                 maybeUpdateAverageSpeed(deliverySchedule, i, delivery);
-                nextDelivery = getNextDelivery(deliverySchedule, i);
             }
         }
 
-        nextDelivery.ifPresent(delivery -> {
+        findNextDelivery(deliveryEvent, deliverySchedule).ifPresent(delivery -> {
             var nextEta = mapService.calculateETA(
                     deliveryEvent.latitude(), deliveryEvent.longitude(),
                     delivery.getLatitude(), delivery.getLongitude());
             sendSoonArrivingEmail(delivery, nextEta);
         });
+
         return deliverySchedule;
+    }
+
+    private Optional<Delivery> findNextDelivery(DeliveryEvent deliveryEvent, List<Delivery> deliverySchedule) {
+        Optional<Delivery> nextDelivery = Optional.empty();
+        for (int i = 0; i < deliverySchedule.size(); i++) {
+            Delivery delivery = deliverySchedule.get(i);
+            if (deliveryEvent.id() == delivery.getId()) {
+                nextDelivery = getNextDelivery(deliverySchedule, i);
+            }
+        }
+        return nextDelivery;
     }
 
     private Optional<Delivery> getNextDelivery(List<Delivery> deliverySchedule, int index) {
