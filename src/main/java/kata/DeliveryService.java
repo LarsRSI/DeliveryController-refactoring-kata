@@ -23,24 +23,26 @@ public class DeliveryService {
     }
 
     public List<Delivery> on(DeliveryEvent deliveryEvent, List<Delivery> deliverySchedule) {
-        findCurrentDelivery(deliveryEvent, deliverySchedule).ifPresent(delivery -> {
+        Optional<Delivery> currentDelivery = findCurrentDelivery(deliveryEvent, deliverySchedule);
+        currentDelivery.ifPresent(delivery -> {
             updateDelivery(deliveryEvent, delivery);
             sendFeedbackEmail(delivery);
-        });
 
-        for (int i = 0; i < deliverySchedule.size(); i++) {
-            Delivery delivery = deliverySchedule.get(i);
-            if (deliveryEvent.id() == delivery.getId()) {
-                if (!delivery.isOnTime() && deliverySchedule.size() > 1 && i > 0) {
-                    var previousDelivery = deliverySchedule.get(i - 1);
-                    Duration elapsedTime = Duration.between(previousDelivery.getTimeOfDelivery(), delivery.getTimeOfDelivery());
-                    mapService.updateAverageSpeed(
-                            elapsedTime,
-                            previousDelivery.getLatitude(), previousDelivery.getLongitude(),
-                            delivery.getLatitude(), delivery.getLongitude());
+            if (!delivery.isOnTime()) {
+                for (int i = 0; i < deliverySchedule.size(); i++) {
+                    if (deliverySchedule.size() > 1 && i > 0) {
+                        var previousDelivery = deliverySchedule.get(i - 1);
+                        Duration elapsedTime = Duration.between(previousDelivery.getTimeOfDelivery(), delivery.getTimeOfDelivery());
+                        mapService.updateAverageSpeed(
+                                elapsedTime,
+                                previousDelivery.getLatitude(), previousDelivery.getLongitude(),
+                                delivery.getLatitude(), delivery.getLongitude());
+                        break;
+                    }
                 }
             }
-        }
+        });
+
 
         findNextDelivery(deliveryEvent, deliverySchedule).ifPresent(delivery -> {
             var nextEta = mapService.calculateETA(
