@@ -1,5 +1,6 @@
 package kata;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -28,52 +29,34 @@ public final class Delivery {
     return id;
   }
 
-  public void setId(long id) {
-    this.id = id;
-  }
-
   public String getContactEmail() {
     return contactEmail;
-  }
-
-  public void setContactEmail(String contactEmail) {
-    this.contactEmail = contactEmail;
-  }
-
-  public void setLatitude(float latitude) {
-    this.latitude = latitude;
-  }
-
-  public void setLongitude(float longitude) {
-    this.longitude = longitude;
   }
 
   public LocalDateTime getTimeOfDelivery() {
     return timeOfDelivery;
   }
 
-  public void setTimeOfDelivery(LocalDateTime timeOfDelivery) {
-    this.timeOfDelivery = timeOfDelivery;
-  }
-
   public boolean isArrived() {
     return arrived;
-  }
-
-  public void setArrived(boolean arrived) {
-    this.arrived = arrived;
   }
 
   public boolean isOnTime() {
     return onTime;
   }
 
-  public void setOnTime(boolean onTime) {
-    this.onTime = onTime;
-  }
-
   public Location getLocation() {
     return new Location(latitude, longitude);
+  }
+
+  void markArrived(DeliveryEvent deliveryEvent) {
+    this.arrived = true;
+    Duration duration = Duration.between(getTimeOfDelivery(), deliveryEvent.timeOfDelivery());
+
+    if (duration.toMinutes() < 10) {
+      this.onTime = true;
+    }
+    this.timeOfDelivery = deliveryEvent.timeOfDelivery();
   }
 
   @Override

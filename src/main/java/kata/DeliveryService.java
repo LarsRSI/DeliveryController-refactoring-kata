@@ -26,7 +26,7 @@ public class DeliveryService {
         Optional<Delivery> currentDelivery = findCurrentDelivery(deliveryEvent, deliverySchedule);
 
         currentDelivery.ifPresent(delivery -> {
-            updateDelivery(deliveryEvent, delivery);
+            delivery.markArrived(deliveryEvent);
             sendFeedbackEmail(delivery);
 
             if (!delivery.isOnTime()) {
@@ -79,16 +79,6 @@ public class DeliveryService {
             return Optional.of(deliverySchedule.get(index + 1));
         }
         return Optional.empty();
-    }
-
-    private void updateDelivery(DeliveryEvent deliveryEvent, Delivery delivery) {
-        delivery.setArrived(true);
-        Duration duration = Duration.between(delivery.getTimeOfDelivery(), deliveryEvent.timeOfDelivery());
-
-        if (duration.toMinutes() < 10) {
-            delivery.setOnTime(true);
-        }
-        delivery.setTimeOfDelivery(deliveryEvent.timeOfDelivery());
     }
 
     private void sendSoonArrivingEmail(Delivery delivery, Duration nextEta) {
