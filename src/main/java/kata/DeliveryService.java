@@ -27,7 +27,10 @@ public class DeliveryService {
         for (int i = 0; i < deliverySchedule.size(); i++) {
             Delivery delivery = deliverySchedule.get(i);
             if (deliveryEvent.id() == delivery.getId()) {
-                nextDelivery = modifyDeliveryAndSendFeedbackEmailAndDetermineNextDeliveryAndMaybeUpdateAverageSpeed(deliveryEvent, deliverySchedule, i, delivery);
+                updateDelivery(deliveryEvent, delivery);
+                sendFeedbackEmail(delivery);
+                maybeUpdateAverageSpeed(deliverySchedule, i, delivery);
+                nextDelivery = getNextDelivery(deliverySchedule, i);
             }
         }
 
@@ -35,35 +38,21 @@ public class DeliveryService {
             var nextEta = mapService.calculateETA(
                     deliveryEvent.latitude(), deliveryEvent.longitude(),
                     delivery.getLatitude(), delivery.getLongitude());
-            var message =
-
-                    "Your delivery to [%s,%s] is next, estimated time of arrival is in %s minutes. Be ready!".formatted(
-                            delivery.getLatitude(), delivery.getLongitude(), nextEta.getSeconds() / 60);
-            emailGateway.send(delivery.getContactEmail(), "Your delivery will arrive soon", message);
+            sendSoonArrivingEmail(delivery, nextEta);
         });
         return deliverySchedule;
     }
 
-    private Optional<Delivery> modifyDeliveryAndSendFeedbackEmailAndDetermineNextDeliveryAndMaybeUpdateAverageSpeed(DeliveryEvent deliveryEvent, List<Delivery> deliverySchedule, int i, Delivery delivery) {
-        updateDelivery(deliveryEvent, delivery);
-
-        sendFeedbackEmail(delivery);
-
-        maybeUpdateAverageSpeed(deliverySchedule, i, delivery);
-
-        return getNextDelivery(deliverySchedule, i);
-    }
-
-    private Optional<Delivery> getNextDelivery(List<Delivery> deliverySchedule, int i) {
-        if (deliverySchedule.size() > i + 1) {
-            return Optional.ofNullable(deliverySchedule.get(i + 1));
+    private Optional<Delivery> getNextDelivery(List<Delivery> deliverySchedule, int index) {
+        if (deliverySchedule.size() > index + 1) {
+            return Optional.of(deliverySchedule.get(index + 1));
         }
         return Optional.empty();
     }
 
-    private void maybeUpdateAverageSpeed(List<Delivery> deliverySchedule, int i, Delivery delivery) {
-        if (!delivery.isOnTime() && deliverySchedule.size() > 1 && i > 0) {
-            var previousDelivery = deliverySchedule.get(i - 1);
+    private void maybeUpdateAverageSpeed(List<Delivery> deliverySchedule, int index, Delivery delivery) {
+        if (!delivery.isOnTime() && deliverySchedule.size() > 1 && index > 0) {
+            var previousDelivery = deliverySchedule.get(index - 1);
             Duration elapsedTime = Duration.between(previousDelivery.getTimeOfDelivery(), delivery.getTimeOfDelivery());
             mapService.updateAverageSpeed(
                     elapsedTime,
@@ -80,6 +69,13 @@ public class DeliveryService {
             delivery.setOnTime(true);
         }
         delivery.setTimeOfDelivery(deliveryEvent.timeOfDelivery());
+    }
+
+    private void sendSoonArrivingEmail(Delivery delivery, Duration nextEta) {
+        var message =
+                "Your delivery to [%s,%s] is next, estimated time of arrival is in %s minutes. Be ready!".formatted(
+                        delivery.getLatitude(), delivery.getLongitude(), nextEta.getSeconds() / 60);
+        emailGateway.send(delivery.getContactEmail(), "Your delivery will arrive soon", message);
     }
 
     private void sendFeedbackEmail(Delivery delivery) {
