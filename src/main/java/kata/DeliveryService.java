@@ -26,7 +26,7 @@ public class DeliveryService {
         for (int i = 0; i < deliverySchedule.size(); i++) {
             Delivery delivery = deliverySchedule.get(i);
             if (deliveryEvent.id() == delivery.getId()) {
-                nextDelivery = doSomething(deliveryEvent, deliverySchedule, nextDelivery, i, delivery);
+                nextDelivery = modifyDeliveryAndSendFeedbackEmailAndDetermineNextDeliveryAndMaybeUpdateAverageSpeed(deliveryEvent, deliverySchedule, nextDelivery, i, delivery);
             }
         }
 
@@ -44,7 +44,27 @@ public class DeliveryService {
         return deliverySchedule;
     }
 
-    private Delivery doSomething(DeliveryEvent deliveryEvent, List<Delivery> deliverySchedule, Delivery nextDelivery, int i, Delivery delivery) {
+    private Delivery modifyDeliveryAndSendFeedbackEmailAndDetermineNextDeliveryAndMaybeUpdateAverageSpeed(DeliveryEvent deliveryEvent, List<Delivery> deliverySchedule, Delivery nextDelivery, int i, Delivery delivery) {
+        updateDelivery(deliveryEvent, delivery);
+
+        sendFeedbackEmail(delivery);
+        
+        if (!delivery.isOnTime() && deliverySchedule.size() > 1 && i > 0) {
+            var previousDelivery = deliverySchedule.get(i - 1);
+            Duration elapsedTime = Duration.between(previousDelivery.getTimeOfDelivery(), delivery.getTimeOfDelivery());
+            mapService.updateAverageSpeed(
+                    elapsedTime,
+                    previousDelivery.getLatitude(), previousDelivery.getLongitude(),
+                    delivery.getLatitude(), delivery.getLongitude());
+        }
+
+        if (deliverySchedule.size() > i + 1) {
+            nextDelivery = deliverySchedule.get(i + 1);
+        }
+        return nextDelivery;
+    }
+
+    private void updateDelivery(DeliveryEvent deliveryEvent, Delivery delivery) {
         delivery.setArrived(true);
         Duration duration = Duration.between(delivery.getTimeOfDelivery(), deliveryEvent.timeOfDelivery());
 
@@ -52,22 +72,11 @@ public class DeliveryService {
             delivery.setOnTime(true);
         }
         delivery.setTimeOfDelivery(deliveryEvent.timeOfDelivery());
+    }
+
+    private void sendFeedbackEmail(Delivery delivery) {
         String message = "Regarding your delivery today at %s. How likely would you be to recommend this delivery service to a friend? Click <a href='url'>here</a>".formatted(
                 DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").format(delivery.getTimeOfDelivery()));
         emailGateway.send(delivery.getContactEmail(), "Your feedback is important to us", message);
-        if (deliverySchedule.size() > i + 1) {
-            nextDelivery = deliverySchedule.get(i + 1);
-        }
-
-        if (!delivery.isOnTime() && deliverySchedule.size() > 1 && i > 0) {
-            var previousDelivery = deliverySchedule.get(i - 1);
-            Duration elapsedTime = Duration.between(previousDelivery.getTimeOfDelivery(),
-                    delivery.getTimeOfDelivery());
-            mapService.updateAverageSpeed(
-                    elapsedTime, previousDelivery.getLatitude(),
-                    previousDelivery.getLongitude(), delivery.getLatitude(),
-                    delivery.getLongitude());
-        }
-        return nextDelivery;
     }
 }
