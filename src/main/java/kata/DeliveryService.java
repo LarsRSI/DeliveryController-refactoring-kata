@@ -29,29 +29,38 @@ public class DeliveryService {
             sendFeedbackEmail(delivery);
 
             if (!delivery.isOnTime()) {
-                for (int i = 0; i < deliverySchedule.size(); i++) {
-                    if (deliverySchedule.size() > 1 && i > 0) {
-                        var previousDelivery = deliverySchedule.get(i - 1);
-                        Duration elapsedTime = Duration.between(previousDelivery.getTimeOfDelivery(), delivery.getTimeOfDelivery());
-                        mapService.updateAverageSpeed(
-                                elapsedTime,
-                                previousDelivery.getLatitude(), previousDelivery.getLongitude(),
-                                delivery.getLatitude(), delivery.getLongitude());
-                        break;
-                    }
-                }
+                findPreviousDelivery(deliverySchedule).ifPresent(previousDelivery -> {
+                    Duration elapsedTime = Duration.between(previousDelivery.getTimeOfDelivery(), delivery.getTimeOfDelivery());
+                    mapService.updateAverageSpeed(
+                            elapsedTime,
+                            previousDelivery.getLatitude(), previousDelivery.getLongitude(),
+                            delivery.getLatitude(), delivery.getLongitude());
+                });
             }
         });
 
 
-        findNextDelivery(deliveryEvent, deliverySchedule).ifPresent(delivery -> {
-            var nextEta = mapService.calculateETA(
-                    deliveryEvent.latitude(), deliveryEvent.longitude(),
-                    delivery.getLatitude(), delivery.getLongitude());
-            sendSoonArrivingEmail(delivery, nextEta);
-        });
+        findNextDelivery(deliveryEvent, deliverySchedule).
+
+                ifPresent(delivery ->
+
+                {
+                    var nextEta = mapService.calculateETA(
+                            deliveryEvent.latitude(), deliveryEvent.longitude(),
+                            delivery.getLatitude(), delivery.getLongitude());
+                    sendSoonArrivingEmail(delivery, nextEta);
+                });
 
         return deliverySchedule;
+    }
+
+    private Optional<Delivery> findPreviousDelivery(List<Delivery> deliverySchedule) {
+        for (int i = 0; i < deliverySchedule.size(); i++) {
+            if (deliverySchedule.size() > 1 && i > 0) {
+                return Optional.of(deliverySchedule.get(i - 1));
+            }
+        }
+        return Optional.empty();
     }
 
     private Optional<Delivery> findCurrentDelivery(DeliveryEvent deliveryEvent, List<Delivery> deliverySchedule) {
