@@ -10,6 +10,7 @@ import java.util.List;
 import static kata.TestFactory.createDeliveryEventWithId;
 import static kata.TestFactory.createDeliveryOrderedAt;
 import static kata.TestFactory.createDeliveryWithId;
+import static kata.TestFactory.deliveryAnyEventAt;
 import static kata.TestFactory.deliveryEventAt;
 import static kata.TestFactory.localDateTime;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -68,6 +69,14 @@ class DeliveryUpdateTest {
         deliveryService.on(deliveryEvent, List.of(delivery));
 
         assertThat(delivery.getTimeOfDelivery()).isEqualTo(localDateTime(19, 40));
+    }
+
+    @Test
+    void delivery_not_in_our_schedule_will_not_throw() {
+        var delivery = createDeliveryOrderedAt(1L, 19, 30);
+        var deliveryEvent = deliveryAnyEventAt();
+
+        deliveryService.on(deliveryEvent, List.of(delivery));
     }
 
 }

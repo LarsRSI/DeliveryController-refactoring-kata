@@ -31,6 +31,10 @@ public class TestFactory {
         return new DeliveryEvent(id, localDateTime(18, 28), 58.377047f, 26.727889f);
     }
 
+    public static DeliveryEvent deliveryAnyEventAt() {
+        return new DeliveryEvent(999L, localDateTime(23, 59), 58.377047f, 26.727889f);
+    }
+
     public static DeliveryEvent deliveryEventAt(int hour, int minute) {
         return new DeliveryEvent(123L, localDateTime(hour, minute), 58.377047f, 26.727889f);
     }

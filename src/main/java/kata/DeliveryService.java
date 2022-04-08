@@ -23,11 +23,10 @@ public class DeliveryService {
     }
 
     public List<Delivery> on(DeliveryEvent deliveryEvent, List<Delivery> deliverySchedule) {
-        Delivery currentDelivery = findCurrentDelivery(deliveryEvent, deliverySchedule);
-        if (currentDelivery != null) {
-            updateDelivery(deliveryEvent, currentDelivery);
-            sendFeedbackEmail(currentDelivery);
-        }
+        findCurrentDelivery(deliveryEvent, deliverySchedule).ifPresent(delivery -> {
+            updateDelivery(deliveryEvent, delivery);
+            sendFeedbackEmail(delivery);
+        });
 
         for (int i = 0; i < deliverySchedule.size(); i++) {
             Delivery delivery = deliverySchedule.get(i);
@@ -53,13 +52,13 @@ public class DeliveryService {
         return deliverySchedule;
     }
 
-    private Delivery findCurrentDelivery(DeliveryEvent deliveryEvent, List<Delivery> deliverySchedule) {
+    private Optional<Delivery> findCurrentDelivery(DeliveryEvent deliveryEvent, List<Delivery> deliverySchedule) {
         for (Delivery delivery : deliverySchedule) {
             if (deliveryEvent.id() == delivery.getId()) {
-                return delivery;
+                return Optional.of(delivery);
             }
         }
-        return null;
+        return Optional.empty();
     }
 
     private Optional<Delivery> findNextDelivery(DeliveryEvent deliveryEvent, List<Delivery> deliverySchedule) {
