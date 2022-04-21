@@ -25,7 +25,7 @@ dependencies {
     runtimeOnly("ch.qos.logback:logback-classic")
     implementation("io.micronaut:micronaut-validation")
     implementation("com.sendgrid:sendgrid-java:4.9.1")
-    implementation("com.twilio.sdk:twilio:8.29.0")
+    implementation("com.twilio.sdk:twilio:8.29.1")
 
     testImplementation(platform("org.junit:junit-bom:5.8.2"))
     testImplementation("org.junit.jupiter:junit-jupiter")
