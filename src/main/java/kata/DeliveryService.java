@@ -22,63 +22,28 @@ public class DeliveryService {
         this.mapService = mapService;
     }
 
-    public List<Delivery> on(DeliveryEvent deliveryEvent, List<Delivery> deliverySchedule) {
-        Optional<Delivery> currentDelivery = findCurrentDelivery(deliveryEvent, deliverySchedule);
+    public List<Delivery> on(DeliveryEvent deliveryEvent, List<Delivery> deliveryList) {
+        var deliverySchedule = new DeliverySchedule(deliveryList);
+        Optional<Delivery> currentDelivery = deliverySchedule.findCurrentDelivery(deliveryEvent);
 
         currentDelivery.ifPresent(delivery -> {
             delivery.markArrived(deliveryEvent);
             sendFeedbackEmail(delivery);
 
             if (!delivery.isOnTime()) {
-                findPreviousDelivery(deliverySchedule).ifPresent(previousDelivery -> {
+                deliverySchedule.findPreviousDelivery(delivery).ifPresent(previousDelivery -> {
                     Duration elapsedTime = Duration.between(previousDelivery.getTimeOfDelivery(), delivery.getTimeOfDelivery());
                     mapService.updateAverageSpeed(elapsedTime, previousDelivery.getLocation(), delivery.getLocation());
                 });
             }
         });
 
-        findNextDelivery(deliveryEvent, deliverySchedule).ifPresent(delivery -> {
+        deliverySchedule.findNextDelivery(deliveryEvent).ifPresent(delivery -> {
             var nextEta = mapService.calculateETA(deliveryEvent.getLocation(), delivery.getLocation());
             sendSoonArrivingEmail(delivery, nextEta);
         });
 
-        return deliverySchedule;
-    }
-
-    private Optional<Delivery> findPreviousDelivery(List<Delivery> deliverySchedule) {
-        for (int i = 0; i < deliverySchedule.size(); i++) {
-            if (deliverySchedule.size() > 1 && i > 0) {
-                return Optional.of(deliverySchedule.get(i - 1));
-            }
-        }
-        return Optional.empty();
-    }
-
-    private Optional<Delivery> findCurrentDelivery(DeliveryEvent deliveryEvent, List<Delivery> deliverySchedule) {
-        for (Delivery delivery : deliverySchedule) {
-            if (deliveryEvent.id() == delivery.getId()) {
-                return Optional.of(delivery);
-            }
-        }
-        return Optional.empty();
-    }
-
-    private Optional<Delivery> findNextDelivery(DeliveryEvent deliveryEvent, List<Delivery> deliverySchedule) {
-        Optional<Delivery> nextDelivery = Optional.empty();
-        for (int i = 0; i < deliverySchedule.size(); i++) {
-            Delivery delivery = deliverySchedule.get(i);
-            if (deliveryEvent.id() == delivery.getId()) {
-                nextDelivery = getNextDelivery(deliverySchedule, i);
-            }
-        }
-        return nextDelivery;
-    }
-
-    private Optional<Delivery> getNextDelivery(List<Delivery> deliverySchedule, int index) {
-        if (deliverySchedule.size() > index + 1) {
-            return Optional.of(deliverySchedule.get(index + 1));
-        }
-        return Optional.empty();
+        return deliveryList;
     }
 
     private void sendSoonArrivingEmail(Delivery delivery, Duration nextEta) {
