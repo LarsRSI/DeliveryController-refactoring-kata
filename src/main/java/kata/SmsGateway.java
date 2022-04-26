@@ -31,7 +31,7 @@ public class SmsGateway {
   public void send(String phoneNumber, String message) {
     var parameters =
         Map.of("To", phoneNumber,
-            "From", "+37201234567",
+            "From", "TODO, what is our sender number to display?",
             "Body", message);
 
     HttpRequest httpRequest = HttpRequest.newBuilder()
