@@ -1,3 +1,5 @@
+![Test Status](../../workflows/test/badge.svg)
+
 DeliveryController Refactoring Kata
 ===================================
 
